@@ -22,4 +22,15 @@ The `PRINT_START` does quite a few things:
  * Wait for the bed to cool down to required temperature.
  * Run the homing, quad gantry level and meshing procedures.
  * Print a pruge line containing a straight section and a zigzag section that aids in seeing how the bed adhesion will be on the print.
- 
+ * Load the initial tool, if ERCF is configured
+
+Example complete start G-code in PrusaSlicer:
+```gcode
+PRINT_START EXTRUDER={first_layer_temperature[initial_tool]} BED=[first_layer_bed_temperature] TOTAL_LAYER={total_layer_count} VERSION=2
+``` 
+
+For ERCF printers, the start G-code will look like this:
+```gcode
+MMU_START_SETUP INITIAL_TOOL={initial_tool} REFERENCED_TOOLS=!referenced_tools! TOOL_COLORS=!colors! TOOL_TEMPS=!temperatures! TOOL_MATERIALS=!materials! FILAMENT_NAMES=!filament_names! PURGE_VOLUMES=!purge_volumes!
+PRINT_START EXTRUDER={first_layer_temperature[initial_tool]} BED=[first_layer_bed_temperature] TOTAL_LAYER={total_layer_count} VERSION=2
+```
