@@ -32,8 +32,8 @@ PRINT_START EXTRUDER={first_layer_temperature[initial_tool]} BED=[first_layer_be
 For ERCF printers, the start G-code will look like this:
 ```gcode
 MMU_START_SETUP INITIAL_TOOL={initial_tool} REFERENCED_TOOLS=!referenced_tools! TOOL_COLORS=!colors! TOOL_TEMPS=!temperatures! TOOL_MATERIALS=!materials! FILAMENT_NAMES=!filament_names! PURGE_VOLUMES=!purge_volumes!
-PRINT_START EXTRUDER={first_layer_temperature[initial_tool]} BED=[first_layer_bed_temperature] TOTAL_LAYER={total_layer_count} VERSION=2 ACTION=heat_calibrate
+PRINT_START EXTRUDER={first_layer_temperature[initial_tool]} BED=[first_layer_bed_temperature] TOTAL_LAYER={total_layer_count} VERSION=2 ACTIONS=preheat_calibrate_fullheat
 MMU_START_CHECK
 MMU_START_LOAD_INITIAL_TOOL
-PRINT_START EXTRUDER={first_layer_temperature[initial_tool]} BED=[first_layer_bed_temperature] TOTAL_LAYER={total_layer_count} VERSION=2 ACTION=purge
+PRINT_START EXTRUDER={first_layer_temperature[initial_tool]} BED=[first_layer_bed_temperature] TOTAL_LAYER={total_layer_count} VERSION=2 ACTIONS=purge
 ```
