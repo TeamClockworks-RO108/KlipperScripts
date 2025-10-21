@@ -22,7 +22,7 @@ The `PRINT_START` does quite a few things:
  * Wait for the bed to cool down to required temperature.
  * Run the homing, quad gantry level and meshing procedures.
  * Print a pruge line containing a straight section and a zigzag section that aids in seeing how the bed adhesion will be on the print.
- * Load the initial tool, if ERCF is configured
+ * For MMU-equipped printers or custom setups, the macro allows executing only a part of the actions using the `ACTIONS=` parameter.
 
 Example complete start G-code in PrusaSlicer:
 ```gcode
@@ -37,3 +37,12 @@ MMU_START_CHECK
 MMU_START_LOAD_INITIAL_TOOL
 PRINT_START EXTRUDER={first_layer_temperature[initial_tool]} BED=[first_layer_bed_temperature] TOTAL_LAYER={total_layer_count} VERSION=2 ACTIONS=purge
 ```
+
+
+# PRINT_END (print_lifecycle.cfg)
+ 
+The `PRINT_END` macro cools down the hotend and bed, parks the nozzle away from the print and resets the extruder state.
+An extra list of fans can be turned off and arbitrary gcode can be injected before and after the final reset stage.
+Like `PRINT_START`, it is able to execute a subset of the actions using the `ACTIONS=` parameter. 
+
+
