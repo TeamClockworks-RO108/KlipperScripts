@@ -1,9 +1,13 @@
 # KlipperScripts
 A collection of Klipper scripts and configs that we use on our printers.
 
-# DUMP_PARAMETERS (development.cfg)
+# DUMP_VARS (development.cfg)
 
-The `DUMP_PARAMETERS` macro will print wach field inside the `printer` object. If the field is a map, it will also print the contents of the map.
+The `DUMP_VARS` macro will print wach field inside the `printer` object. If the field is a map, it will also print the contents of the map.
+
+# SEARCH_VARS (development.cfg)
+
+The `SEARCH_VARS` macro will print all fields inside the `printer` object that contains the string given by the `S=` parameter.
 
 # HEATSOAK (heatsoak.cfg)
 
