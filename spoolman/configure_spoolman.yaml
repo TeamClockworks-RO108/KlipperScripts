@@ -1,0 +1,103 @@
+---
+- name: Install dnsmasq and configure nginx proxy for spoolman
+  hosts: all
+  become: true
+
+  vars:
+    spoolman_api_key: "CHANGE_ME"   # override via --extra-vars or group_vars/host_vars
+    spoolman_domain: "spoolman.lucres.net"
+    spoolman_domain_secondary: "spoolman-intl.lucres.net"
+    moonraker_users:
+      - pi
+      - clk
+      - clock
+      - printer
+      - klipper
+      - raspberry
+
+  tasks:
+    - name: Install dnsmasq and nginx
+      ansible.builtin.apt:
+        name:
+          - dnsmasq
+          - nginx
+        state: present
+        update_cache: true
+
+    - name: Enable and start dnsmasq
+      ansible.builtin.systemd:
+        name: dnsmasq
+        enabled: true
+        state: started
+
+    - name: Ensure secondary spoolman domain exists in /etc/hosts
+      ansible.builtin.lineinfile:
+        path: /etc/hosts
+        line: "127.0.0.1       {{ spoolman_domain_secondary }}"
+        state: present
+        create: false
+
+    - name: Create nginx site config for spoolman
+      ansible.builtin.copy:
+        dest: /etc/nginx/sites-available/spoolman
+        owner: root
+        group: root
+        mode: "0644"
+        content: |
+          server {
+              listen 80;
+              server_name {{ spoolman_domain_secondary }};
+
+              location / {
+                  set $upt https;
+                  set $ust {{ spoolman_domain }};
+                  resolver localhost;
+
+                  proxy_pass $upt://$ust;
+                  proxy_set_header X-Api-Key "{{ spoolman_api_key }}";
+                  proxy_set_header Upgrade $http_upgrade;
+                  proxy_set_header Connection "upgrade";
+                  proxy_read_timeout 86400;
+                  proxy_send_timeout 86400;
+                  proxy_ssl_server_name on;
+                  proxy_ssl_name $ust;
+                  proxy_set_header Host $ust;
+              }
+          }
+
+    - name: Enable spoolman site (symlink into sites-enabled)
+      ansible.builtin.file:
+        src: /etc/nginx/sites-available/spoolman
+        dest: /etc/nginx/sites-enabled/spoolman
+        state: link
+      notify:
+        - Test nginx config
+        - Restart nginx
+
+
+    - name: Check for existing moonraker.conf files
+      ansible.builtin.stat:
+        path: "/home/{{ item }}/printer_data/config/moonraker.conf"
+      loop: "{{ moonraker_users }}"
+      register: moonraker_conf_stats
+
+    - name: Ensure [spoolman] block exists in moonraker.conf
+      ansible.builtin.blockinfile:
+        path: "{{ item.stat.path }}"
+        marker: "# {mark} ANSIBLE MANAGED SPOOLMAN"
+        block: |
+          [spoolman]
+          server: http://{{ spoolman_domain_secondary }}
+          sync_rate: 5
+      loop: "{{ moonraker_conf_stats.results }}"
+      when: item.stat.exists
+
+  handlers:
+    - name: Test nginx config
+      ansible.builtin.command: nginx -t
+      changed_when: false
+
+    - name: Restart nginx
+      ansible.builtin.systemd:
+        name: nginx
+        state: restarted
