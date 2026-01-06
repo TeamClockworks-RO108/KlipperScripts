@@ -49,4 +49,8 @@ The `PRINT_END` macro cools down the hotend and bed, parks the nozzle away from 
 An extra list of fans can be turned off and arbitrary gcode can be injected before and after the final reset stage.
 Like `PRINT_START`, it is able to execute a subset of the actions using the `ACTIONS=` parameter. 
 
+# Spoolman macros and configuration
 
+The `spoolman.cfg` file contains the standard macros usually used with spoolman (`SET_ACTIVE_SPOOL` and `CLEAR_ACTIVE_SPOOL`)
+
+The spoolman folder contains an ansible setup script to configure spoolman to be accessed over an authentik-protected reverse-proxy.This is a more complicated setup and more details can be found on our [wiki page](https://wiki.teamclockworks.ro/en/Infrastructure/spoolman-auth).
