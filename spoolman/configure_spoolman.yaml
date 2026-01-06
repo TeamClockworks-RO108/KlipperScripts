@@ -70,9 +70,11 @@
         src: /etc/nginx/sites-available/spoolman
         dest: /etc/nginx/sites-enabled/spoolman
         state: link
-      notify:
-        - Test nginx config
-        - Restart nginx
+
+    - name: Restart nginx
+      ansible.builtin.systemd:
+        name: nginx
+        state: restarted
 
 
     - name: Check for existing moonraker.conf files
@@ -97,7 +99,4 @@
       ansible.builtin.command: nginx -t
       changed_when: false
 
-    - name: Restart nginx
-      ansible.builtin.systemd:
-        name: nginx
-        state: restarted
+
